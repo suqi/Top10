@@ -1,0 +1,59 @@
+﻿<%@ master language="C#" autoeventwireup="true" inherits="SiteMaster, App_Web_vynzljup" %><!DOCTYPE html><html>
+<% string baseUrl = ResolveUrl("~");
+   MongoDB.Bson.BsonDocument user = null;
+   var page = this.Page as BasePage;
+   if (page != null)
+       user = page.CurrentUser;
+    %><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="keywords" content="问答，大学生" />
+<meta name="description" content="flakelife.com是一个面向大学生的问答社区" />
+<link href="<%=baseUrl %>styles/site.css?v=20110719" rel="stylesheet" />
+<script src="<%=baseUrl %>scripts/jquery-1.5.1.min.js"></script>
+<script src="<%=baseUrl %>scripts/common.js?v=20110719"></script>
+<script src="<%=baseUrl %>scripts/jquery.form-2.67.js"></script><asp:ContentPlaceHolder ID="HeadContent" runat="server"></asp:ContentPlaceHolder></head>
+<body>
+<div class="top-nav">
+<div class="bd">
+<div class="top-nav-info">
+    <%if(user==null) {%>
+        <a href="<%=baseUrl %>accounts/login.aspx">登录</a><a href="<%=baseUrl %>accounts/register.aspx">注册</a>
+    <%}else{ %>
+        <a href="<%=baseUrl %>accounts/profile.aspx"><%=user["realname"].AsString%></a>
+        <a href="<%=baseUrl %>fellow/follow.aspx">好友</a>
+        <a href="<%=baseUrl %>accounts/inbox.aspx">站内信(<b id="unread_msg">0</b>)</a>
+        <a href="<%=baseUrl %>accounts/logout.aspx">退出</a>
+    <%} %>
+</div>
+<div class="top-nav-items">
+    <a href="<%=baseUrl %>qa/questions.aspx" style="font-size:14px;color:#AE0000;font-weight:bold;margin-right:20px"><%=ConfigHelper.SiteName %></a><span class="ignore">专注于大学生的知识问答社区</span>
+    <%--<ul>
+        <li id="wd"><a href="<%=baseUrl %>qa/questions.aspx">问答</a></li>
+        <li id="hd"><a href="<%=baseUrl %>event/plan.aspx">计划</a></li>
+    </ul>--%>
+</div>
+</div>
+</div>
+<div id="wrapper">
+<asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
+<div class="clearfix"></div>
+<div id="footer"> 
+    <span class="fleft gray-link"> &copy; 2011－   flakelife.com, all rights reserved </span>
+    <span class="fright">
+        <a href="<%=baseUrl %>about.aspx">关于我们</a>· <a href="<%=baseUrl %>contact.aspx">联系我们</a>· <a href="<%=baseUrl %>policy.aspx">免责声明</a>
+    </span>
+</div>
+</div>
+<%if(user!=null){ %>
+<script>
+function getMsg() {
+    $.post('<%=baseUrl %>service/auth.aspx?action=getmsg', {}, function (r) {
+        if (r && r.status == 200 && r.detail != 0) {
+            $('#unread_msg').html(r.detail).addClass('unread-msg');
+        }
+    });
+}
+$(function () {setInterval(getMsg, 60*1000);});
+</script>
+<%} %>
+</body></html>
